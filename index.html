@@ -47,6 +47,26 @@
         }
         .lf-arrow { font-size: 0.5rem; color: #1c1c1c; }
 
+        .how-it-works {
+            margin-bottom: 2rem;
+            padding: 0.85rem 1rem;
+            border: 1px solid #181818;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+        .hiw-row {
+            display: flex;
+            gap: 0.65rem;
+            align-items: baseline;
+            font-size: 0.74rem;
+            color: #2d2d2d;
+            line-height: 1.5;
+        }
+        .hiw-icon { color: #222; flex-shrink: 0; font-size: 0.6rem; margin-top: 0.1rem; }
+        .hiw-row b { color: #3a3a3a; font-weight: 600; }
+
         .field-label {
             font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
             color: #282828; margin-bottom: 0.5rem;
@@ -60,7 +80,7 @@
             resize: vertical; width: 100%; min-height: 164px;
             outline: none; transition: border-color 0.2s;
         }
-        textarea:focus { border-color: #2a2a2a; }
+        textarea:focus { border-color: #8f8f8f; }
         textarea::placeholder { color: #1a1a1a; }
 
         .start-footer {
@@ -84,7 +104,7 @@
         }
         .prog-left { display: flex; align-items: center; gap: 0.65rem; min-width: 0; }
         .prog-sent {
-            font-size: 0.66rem; color: #2a2a2a;
+            font-size: 0.66rem; color: #8f8f8f;
             letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
         }
         .phase-badge {
@@ -189,7 +209,7 @@
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1.8rem; }
         .stat { background: #111; border: 1px solid #181818; border-radius: 10px; padding: 1.1rem 0.8rem; text-align: center; }
         .stat-val { font-family: 'Courier New', monospace; font-size: 1.7rem; font-weight: 700; color: #ddd; letter-spacing: -0.02em; }
-        .stat-lbl { font-size: 0.62rem; color: #2a2a2a; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.3rem; }
+        .stat-lbl { font-size: 0.62rem; color: #8f8f8f; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.3rem; }
         .summary-actions { display: flex; gap: 0.75rem; }
         .btn-secondary {
             padding: 0.65rem 1.3rem; font-size: 0.85rem; font-weight: 500;
@@ -197,7 +217,7 @@
             border-radius: 8px; cursor: pointer;
             transition: color 0.15s, border-color 0.15s;
         }
-        .btn-secondary:hover { color: #777; border-color: #2a2a2a; }
+        .btn-secondary:hover { color: #777; border-color: #8f8f8f; }
     </style>
 </head>
 <body>
@@ -214,6 +234,11 @@
         <span class="lf-pill">Blind</span>
         <span class="lf-arrow">›</span>
         <span class="lf-pill">Review every 2</span>
+    </div>
+    <div class="how-it-works">
+        <div class="hiw-row"><span class="hiw-icon">▸</span><span>Type the <b>first letter</b> of each word to reveal it and move on — wrong key flashes red, nothing advances.</span></div>
+        <div class="hiw-row"><span class="hiw-icon">▸</span><span>Each sentence runs through <b>three levels</b>: full words visible → partial hints (2nd &amp; last letter only) → completely blind.</span></div>
+        <div class="hiw-row"><span class="hiw-icon">▸</span><span>Every <b>2 sentences</b>, type the whole passage from memory as a review. <b>3 or more mistakes</b> on a blind or review phase and it replays.</span></div>
     </div>
     <div class="field-label">Your text</div>
     <textarea id="text-input" autofocus placeholder="Paste any paragraph here…"></textarea>
