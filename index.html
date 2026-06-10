@@ -235,6 +235,31 @@
         }
         .btn-secondary:hover { color: #777; border-color: #8f8f8f; }
 
+        /* ── Weak spots ── */
+        .weak-spots { margin-bottom: 1.8rem; }
+        .ws-title {
+            font-size: 0.62rem; color: #2e2e2e;
+            letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem;
+        }
+        .ws-item { margin-bottom: 0.7rem; }
+        .ws-bar-track {
+            height: 2px; background: #161616; border-radius: 1px;
+            margin-bottom: 0.38rem; overflow: hidden;
+        }
+        .ws-bar-fill { height: 100%; border-radius: 1px; }
+        .ws-row { display: flex; align-items: baseline; gap: 0.5rem; }
+        .ws-num {
+            font-size: 0.58rem; color: #383838; letter-spacing: 0.06em;
+            text-transform: uppercase; white-space: nowrap; min-width: 3.2rem;
+        }
+        .ws-text {
+            font-size: 0.68rem; color: #484848;
+            font-family: 'Courier New', monospace;
+            flex: 1; overflow: hidden; text-overflow: ellipsis;
+            white-space: nowrap; min-width: 0;
+        }
+        .ws-count { font-size: 0.68rem; font-family: 'Courier New', monospace; white-space: nowrap; }
+
         /* ── Side-drill tab ── */
         #side-tab {
             position: fixed;
@@ -367,6 +392,10 @@
         <div class="stat"><div class="stat-val" id="v-total">—</div><div class="stat-lbl">Keystrokes</div></div>
         <div class="stat"><div class="stat-val" id="v-wpm">—</div><div class="stat-lbl">Words / min</div></div>
     </div>
+    <div id="ws-section" class="weak-spots" style="display:none">
+        <div class="ws-title">Weak spots</div>
+        <div id="v-weakspots"></div>
+    </div>
     <div class="summary-actions">
         <button class="btn-primary"   id="restart-btn">Drill Again</button>
         <button class="btn-secondary" id="newtext-btn">New Text</button>
@@ -430,6 +459,7 @@ let isReview   = false;
 let drillWords = [];     // flat word list for the active drill
 let wordIdx    = 0;
 let t0 = null, wrongs = 0, rights = 0, phaseWrongs = 0;
+let sentWrongs = [];   // sentWrongs[i] = mistake count for sentence i (level 2+ only)
 
 let sideDrillActive    = false;
 let savedState         = null;    // { sentIdx, level, isReview }
@@ -559,7 +589,7 @@ function lockButtons() {
 
 function startSentence(idx, lvl) {
     isReview = false; sentIdx = idx; level = lvl;
-    drillWords = tokenize(sentences[idx]).map(w => ({ ...w, newSent: false }));
+    drillWords = tokenize(sentences[idx]).map(w => ({ ...w, newSent: false, sentI: idx }));
     wordIdx = 0; phaseWrongs = 0;
     if (!drillWords.length) { advanceAfterLevel3(); return; }
     updateProgress(); render(); focusInput();
@@ -569,7 +599,7 @@ function startReview() {
     isReview = true; drillWords = [];
     for (let i = 0; i < sentIdx; i++) {
         tokenize(sentences[i]).forEach((w, j) => {
-            drillWords.push({ ...w, newSent: j === 0 && i > 0 });
+            drillWords.push({ ...w, newSent: j === 0 && i > 0, sentI: i });
         });
     }
     wordIdx = 0; phaseWrongs = 0;
@@ -586,7 +616,7 @@ function startBlindRun() {
     drillWords   = [];
     sentences.forEach((sent, i) => {
         tokenize(sent).forEach((w, j) => {
-            drillWords.push({ ...w, newSent: j === 0 && i > 0 });
+            drillWords.push({ ...w, newSent: j === 0 && i > 0, sentI: i });
         });
     });
     wordIdx = 0; phaseWrongs = 0;
@@ -614,7 +644,7 @@ function startSideDrillPhase() {
     drillWords = [];
     for (let i = startI; i <= endI && i < sentences.length; i++) {
         tokenize(sentences[i]).forEach((w, j) => {
-            drillWords.push({ ...w, newSent: j === 0 && i > startI });
+            drillWords.push({ ...w, newSent: j === 0 && i > startI, sentI: i });
         });
     }
 
@@ -762,6 +792,12 @@ $('inp').addEventListener('keydown', e => {
         if (wordIdx >= drillWords.length) onSectionDone();
     } else {
         wrongs++; phaseWrongs++;
+        // Count toward per-sentence tally for level 2+, blind, review phases
+        const countable = level >= 2 || isReview || blindRunMode || sideDrillActive;
+        if (countable) {
+            const si = drillWords[wordIdx]?.sentI;
+            if (si != null) sentWrongs[si] = (sentWrongs[si] || 0) + 1;
+        }
         const inp = $('inp');
         inp.classList.remove('err');
         void inp.offsetWidth;
@@ -838,6 +874,7 @@ $('start-btn').addEventListener('click', () => {
     if (!parsed.length) return;
     sentences = parsed;
     sentIdx = 0; t0 = null; wrongs = 0; rights = 0;
+    sentWrongs = new Array(parsed.length).fill(0);
     sideDrillActive = false; savedState = null; blindRunMode = false;
     lastStartMode = startMode;
     show('drill');
@@ -847,6 +884,7 @@ $('start-btn').addEventListener('click', () => {
 
 $('restart-btn').addEventListener('click', () => {
     sentIdx = 0; t0 = null; wrongs = 0; rights = 0;
+    sentWrongs = new Array(sentences.length).fill(0);
     sideDrillActive = false; savedState = null; blindRunMode = false;
     show('drill');
     if (lastStartMode === 'blind') startBlindRun();
@@ -881,6 +919,35 @@ function endGame() {
     $('v-wrong').textContent = wrongs;
     $('v-total').textContent = total;
     $('v-wpm').textContent   = wpm;
+
+    // Weak spots
+    const maxW = Math.max(0, ...sentWrongs);
+    const wsSection = $('ws-section');
+    if (maxW === 0) {
+        wsSection.style.display = 'none';
+    } else {
+        wsSection.style.display = '';
+        const sorted = sentWrongs
+            .map((n, i) => ({ i, n }))
+            .filter(x => x.n > 0)
+            .sort((a, b) => b.n - a.n)
+            .slice(0, 6);
+        $('v-weakspots').innerHTML = sorted.map(({ i, n }) => {
+            const words   = sentences[i].trim().split(/\s+/);
+            const preview = words.slice(0, 7).join(' ') + (words.length > 7 ? '…' : '');
+            const pct     = Math.round(n / maxW * 100);
+            const color   = n >= 6 ? '#ef4444' : n >= 3 ? '#f59e0b' : '#525252';
+            return `<div class="ws-item">
+  <div class="ws-bar-track"><div class="ws-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+  <div class="ws-row">
+    <span class="ws-num">sent ${i + 1}</span>
+    <span class="ws-text">${preview}</span>
+    <span class="ws-count" style="color:${color}">×${n}</span>
+  </div>
+</div>`;
+        }).join('');
+    }
+
     show('summary');
 }
 </script>
