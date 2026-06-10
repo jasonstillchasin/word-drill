@@ -376,8 +376,9 @@
     <div class="drill-actions">
         <button id="back-btn"    class="btn-ghost" disabled>‹ Back</button>
         <div class="drill-actions-right">
-            <button id="rephase-btn" class="btn-ghost">↺ Restart</button>
-            <button id="next-btn"    class="btn-ghost">Skip ›</button>
+            <button id="rephase-btn"  class="btn-ghost">↺ Restart</button>
+            <button id="skipsent-btn" class="btn-ghost" disabled>⇥ Sent</button>
+            <button id="next-btn"     class="btn-ghost">Skip ›</button>
         </div>
     </div>
 </div>
@@ -579,12 +580,14 @@ function focusInput() {
     $('back-btn').disabled    = atStart;
     $('rephase-btn').disabled = false;
     $('next-btn').disabled    = false;
-    $('side-tab').disabled   = sideDrillActive || blindRunMode;
+    $('side-tab').disabled    = sideDrillActive || blindRunMode;
     $('side-tab').classList.toggle('active', sideDrillActive);
+    const multiSent = isReview || blindRunMode || sideDrillActive;
+    $('skipsent-btn').disabled = !multiSent;
 }
 
 function lockButtons() {
-    $('back-btn').disabled = $('rephase-btn').disabled = $('next-btn').disabled = $('side-tab').disabled = true;
+    $('back-btn').disabled = $('rephase-btn').disabled = $('skipsent-btn').disabled = $('next-btn').disabled = $('side-tab').disabled = true;
 }
 
 function startSentence(idx, lvl) {
@@ -741,6 +744,23 @@ function showFeedback(text, color, cb) {
     setTimeout(() => { ov.classList.remove('on'); setTimeout(cb, 200); }, 750);
 }
 
+// ── Skip sentence ─────────────────────────────────────────────
+
+function skipCurrentSentence() {
+    if (!drillWords.length || wordIdx >= drillWords.length) return;
+    const curSentI = drillWords[wordIdx].sentI;
+    const nextIdx  = drillWords.findIndex((w, i) => i > wordIdx && w.sentI !== curSentI);
+    if (nextIdx === -1) {
+        // Last sentence in this phase — complete it
+        wordIdx = drillWords.length;
+        render();
+        onSectionDone();
+    } else {
+        wordIdx = nextIdx;
+        render();
+    }
+}
+
 // ── Nav helpers (shared by buttons + arrow keys) ─────────────
 
 function closeSidePanel() {
@@ -778,6 +798,11 @@ function handleNext() {
 $('inp').addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft'  && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); handleBack(); return; }
     if (e.key === 'ArrowRight' && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); handleNext(); return; }
+    if (e.key === 'Tab'        && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        if (isReview || blindRunMode || sideDrillActive) skipCurrentSentence();
+        return;
+    }
     if (e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
     e.preventDefault();
     if (!t0) t0 = Date.now();
@@ -807,6 +832,8 @@ $('inp').addEventListener('keydown', e => {
 });
 
 // ── Drill nav buttons ────────────────────────────────────────
+
+$('skipsent-btn').addEventListener('click', () => skipCurrentSentence());
 
 $('rephase-btn').addEventListener('click', () => {
     closeSidePanel();
