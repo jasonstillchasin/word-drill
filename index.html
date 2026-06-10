@@ -102,14 +102,14 @@
         }
         .mode-tab {
             font-size: 0.7rem; padding: 0.3rem 0.85rem;
-            border-radius: 6px; border: 1px solid #1d1d1d;
-            background: none; color: #2a2a2a; cursor: pointer;
+            border-radius: 6px; border: 1px solid #2a2a2a;
+            background: none; color: #555; cursor: pointer;
             font-family: inherit; letter-spacing: 0.04em;
             transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
-        .mode-tab:hover:not(.active) { color: #555; border-color: #282828; }
+        .mode-tab:hover:not(.active) { color: #888; border-color: #3a3a3a; }
         .mode-tab.active {
-            color: #c0c0c0; border-color: #2e2e2e; background: #111;
+            color: #d0d0d0; border-color: #3a3a3a; background: #111;
         }
 
         /* ── Drill ──────────────────────────────────────────── */
@@ -241,8 +241,8 @@
             right: 0; top: 50%;
             transform: translateY(-50%);
             background: #0c0c0c;
-            border: 1px solid #1e1e1e; border-right: none;
-            color: #272727;
+            border: 1px solid #2a2a2a; border-right: none;
+            color: #555;
             font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
             writing-mode: vertical-rl;
             padding: 1.1rem 0.48rem;
@@ -252,9 +252,9 @@
             z-index: 20; display: none;
         }
         #side-tab.visible { display: block; }
-        #side-tab:hover:not(:disabled) { color: #555; border-color: #2e2e2e; background: #111; }
-        #side-tab:disabled { opacity: 0.1; cursor: not-allowed; }
-        #side-tab.open   { color: #888; border-color: #2e2e2e; background: #111; }
+        #side-tab:hover:not(:disabled) { color: #999; border-color: #3a3a3a; background: #111; }
+        #side-tab:disabled { opacity: 0.25; cursor: not-allowed; }
+        #side-tab.open   { color: #aaa; border-color: #3a3a3a; background: #111; }
         #side-tab.active { color: #6366f1; border-color: #312e81; }
 
         /* ── Side-drill panel ── */
