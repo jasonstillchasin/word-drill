@@ -8,6 +8,18 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        :root {
+            --control-bg: #171b23;
+            --control-bg-hover: #212836;
+            --control-border: #536079;
+            --control-border-hover: #70809d;
+            --control-text: #c2cad8;
+            --control-text-hover: #f0f4ff;
+            --control-active-bg: #172554;
+            --control-active-border: #3b82f6;
+            --control-active-text: #dbeafe;
+        }
+
         body {
             background: #0c0c0c;
             color: #777;
@@ -88,12 +100,16 @@
         }
         .btn-primary {
             padding: 0.68rem 1.7rem; font-size: 0.88rem; font-weight: 600;
-            background: #2563eb; color: #fff; border: none; border-radius: 8px;
+            background: #2563eb; color: #f8faff; border: 1px solid #3b82f6; border-radius: 8px;
             cursor: pointer; letter-spacing: -0.01em;
-            transition: background 0.15s, transform 0.1s;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s;
         }
-        .btn-primary:hover  { background: #1d55d8; }
+        .btn-primary:hover  { background: #1d4ed8; border-color: #60a5fa; }
         .btn-primary:active { transform: scale(0.97); }
+        button:focus-visible {
+            outline: 2px solid #60a5fa;
+            outline-offset: 3px;
+        }
         .start-hint { font-size: 0.65rem; color: #1e1e1e; }
 
         /* ── Mode tabs (start screen) ── */
@@ -102,14 +118,20 @@
         }
         .mode-tab {
             font-size: 0.7rem; padding: 0.3rem 0.85rem;
-            border-radius: 6px; border: 1px solid #2a2a2a;
-            background: none; color: #555; cursor: pointer;
+            border-radius: 6px; border: 1px solid var(--control-border);
+            background: var(--control-bg); color: var(--control-text); cursor: pointer;
             font-family: inherit; letter-spacing: 0.04em;
             transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
-        .mode-tab:hover:not(.active) { color: #888; border-color: #3a3a3a; }
+        .mode-tab:hover:not(.active) {
+            color: var(--control-text-hover);
+            border-color: var(--control-border-hover);
+            background: var(--control-bg-hover);
+        }
         .mode-tab.active {
-            color: #d0d0d0; border-color: #3a3a3a; background: #111;
+            color: var(--control-active-text);
+            border-color: var(--control-active-border);
+            background: var(--control-active-bg);
         }
 
         /* ── Drill ──────────────────────────────────────────── */
@@ -185,13 +207,17 @@
         }
         .drill-actions-right { margin-left: auto; display: flex; gap: 0.45rem; }
         .btn-ghost {
-            background: none; border: 1px solid #181818; color: #252525;
+            background: var(--control-bg); border: 1px solid var(--control-border); color: var(--control-text);
             font-size: 0.67rem; padding: 0.3rem 0.72rem; border-radius: 6px;
             cursor: pointer; letter-spacing: 0.04em; font-family: inherit;
-            transition: color 0.15s, border-color 0.15s;
+            transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
-        .btn-ghost:hover:not(:disabled) { color: #505050; border-color: #2c2c2c; }
-        .btn-ghost:disabled { opacity: 0.18; cursor: not-allowed; }
+        .btn-ghost:hover:not(:disabled) {
+            color: var(--control-text-hover);
+            border-color: var(--control-border-hover);
+            background: var(--control-bg-hover);
+        }
+        .btn-ghost:disabled { opacity: 0.42; cursor: not-allowed; }
 
         /* ── Level-advance banner ── */
         #lvl-banner {
@@ -229,11 +255,15 @@
         .summary-actions { display: flex; gap: 0.75rem; }
         .btn-secondary {
             padding: 0.65rem 1.3rem; font-size: 0.85rem; font-weight: 500;
-            background: none; color: #444; border: 1px solid #1e1e1e;
+            background: var(--control-bg); color: var(--control-text); border: 1px solid var(--control-border);
             border-radius: 8px; cursor: pointer;
-            transition: color 0.15s, border-color 0.15s;
+            transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
-        .btn-secondary:hover { color: #777; border-color: #8f8f8f; }
+        .btn-secondary:hover {
+            color: var(--control-text-hover);
+            border-color: var(--control-border-hover);
+            background: var(--control-bg-hover);
+        }
 
         /* ── Weak spots ── */
         .weak-spots { margin-bottom: 1.8rem; }
@@ -265,9 +295,9 @@
             position: fixed;
             right: 0; top: 50%;
             transform: translateY(-50%);
-            background: #0c0c0c;
-            border: 1px solid #2a2a2a; border-right: none;
-            color: #555;
+            background: var(--control-bg);
+            border: 1px solid var(--control-border); border-right: none;
+            color: var(--control-text);
             font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
             writing-mode: vertical-rl;
             padding: 1.1rem 0.48rem;
@@ -277,10 +307,18 @@
             z-index: 20; display: none;
         }
         #side-tab.visible { display: block; }
-        #side-tab:hover:not(:disabled) { color: #999; border-color: #3a3a3a; background: #111; }
-        #side-tab:disabled { opacity: 0.25; cursor: not-allowed; }
-        #side-tab.open   { color: #aaa; border-color: #3a3a3a; background: #111; }
-        #side-tab.active { color: #6366f1; border-color: #312e81; }
+        #side-tab:hover:not(:disabled) {
+            color: var(--control-text-hover);
+            border-color: var(--control-border-hover);
+            background: var(--control-bg-hover);
+        }
+        #side-tab:disabled { opacity: 0.42; cursor: not-allowed; }
+        #side-tab.open,
+        #side-tab.active {
+            color: var(--control-active-text);
+            border-color: var(--control-active-border);
+            background: var(--control-active-bg);
+        }
 
         /* ── Side-drill panel ── */
         #side-panel {
@@ -312,13 +350,17 @@
         #sp-count::-webkit-outer-spin-button { -webkit-appearance: none; }
         #sp-count:focus { border-color: #2e2e2e; }
         #sp-go {
-            background: none; border: 1px solid #1e1e1e; color: #2e2e2e;
+            background: var(--control-bg); border: 1px solid var(--control-border); color: var(--control-text);
             font-size: 0.63rem; letter-spacing: 0.06em;
             padding: 0.32rem 0; border-radius: 5px;
             cursor: pointer; font-family: inherit; width: 100%;
-            transition: color 0.15s, border-color 0.15s;
+            transition: color 0.15s, border-color 0.15s, background 0.15s;
         }
-        #sp-go:hover { color: #777; border-color: #333; }
+        #sp-go:hover {
+            color: var(--control-text-hover);
+            border-color: var(--control-border-hover);
+            background: var(--control-bg-hover);
+        }
     </style>
 </head>
 <body>
@@ -431,8 +473,8 @@ function show(id) {
 // ── Parsing ──────────────────────────────────────────────────
 
 function splitSentences(text) {
-    return text.trim()
-        .split(/(?<=[.!?])(?=\s|$)/)
+    const sentences = text.trim().match(/.*?[.!?]["'”’»)\]}]*(?=\s|$)|.+$/gs) || [];
+    return sentences
         .flatMap(s => s.trim()
             .split(/(?<=[;—–])\s*|\s+--\s+|(?<=:)\s+(?=[A-Za-z])/)
             .map(p => p.trim()).filter(Boolean))
